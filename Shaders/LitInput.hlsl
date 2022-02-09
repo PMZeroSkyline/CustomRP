@@ -1,6 +1,8 @@
 ﻿#ifndef CUSTOM_LIT_INPUT_INCLUDED
 #define CUSTOM_LIT_INPUT_INCLUDED
 
+#include "../ShaderLibrary/Common.hlsl"
+
 TEXTURE2D(_BaseMap);
 SAMPLER(sampler_BaseMap);
 

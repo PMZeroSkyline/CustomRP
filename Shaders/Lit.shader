@@ -20,7 +20,7 @@
     {
 		HLSLINCLUDE
 		#include "../ShaderLibrary/Common.hlsl"
-		#include "UnlitInput.hlsl"
+		#include "LitInput.hlsl"
 		ENDHLSL
         Pass
         {

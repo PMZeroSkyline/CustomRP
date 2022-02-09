@@ -31,7 +31,6 @@ Varyings LitPassVertex (Attributes input) {
 	output.normalWS = TransformObjectToWorldNormal(input.normalOS);
 	return output;
 }
-
 float4 LitPassFragment (Varyings input) : SV_TARGET {
 	UNITY_SETUP_INSTANCE_ID(input);
 	float4 base = GetBase(input.baseUV);
@@ -53,6 +52,7 @@ float4 LitPassFragment (Varyings input) : SV_TARGET {
 	#else
 	BRDF brdf = GetBRDF(surface);
 	#endif
+
 	GI gi = GetGI(GI_FRAGMENT_DATA(input), surface);
 	float3 color = GetLighting(surface, brdf, gi);
 	return float4(color, surface.alpha);
