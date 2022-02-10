@@ -20,6 +20,15 @@ Light GetDirectionalLight (int index, Surface surfaceWS, ShadowData shadowData)
     light.attenuation = GetDirectionalShadowAttenuation(dirShadowData, shadowData, surfaceWS);
     return light;
 }
+Light GetOtherLight (int index, Surface surfaceWS, ShadowData shadowData)
+{
+    Light light;
+    light.color = _OtherLightColors[index].rgb;
+    float3 ray = _OtherLightPositions[index].xyz - surfaceWS.position;
+    light.direction = normalize(ray);
+    light.attenuation = 1.0;
+    return light;
+}
 float3 GetLighting (Surface surfaceWS, BRDF brdf, GI gi)
 {
     ShadowData shadowData = GetShadowData(surfaceWS);
@@ -32,7 +41,11 @@ float3 GetLighting (Surface surfaceWS, BRDF brdf, GI gi)
         Light light = GetDirectionalLight(i, surfaceWS, shadowData);
         color += GetLighting(surfaceWS, brdf, light);
     }
-   
+    for (int j = 0; j < GetOtherLightCount(); j++)
+    {
+        Light light = GetOtherLight(j, surfaceWS, shadowData);
+        color += GetLighting(surfaceWS, brdf, light);
+    }
     return color;
 }
 #endif

@@ -1,6 +1,6 @@
 #ifndef CUSTOM_SHADOW_CASTER_PASS_INCLUDED
 #define CUSTOM_SHADOW_CASTER_PASS_INCLUDED
-
+#include "UnlitInput.hlsl"
 struct Attributes {
     float3 positionOS : POSITION;
     float2 baseUV : TEXCOORD0;

@@ -5,7 +5,7 @@
 #include "../ShaderLibrary/Shadows.hlsl"
 #include "../ShaderLibrary/Light.hlsl"
 #include "../ShaderLibrary/BRDF.hlsl"
-
+#include "UnlitInput.hlsl"
 struct Attributes {
     float3 positionOS : POSITION;
     float2 baseUV : TEXCOORD0;
