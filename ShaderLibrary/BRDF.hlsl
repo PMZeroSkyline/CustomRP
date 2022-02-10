@@ -1,7 +1,7 @@
 #ifndef CUSTOM_BRDF_INCLUDED
 #define CUSTOM_BRDF_INCLUDED
 #define MIN_REFLECTIVITY 0.04
-
+#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/ImagebasedLighting.hlsl"
 #include "Surface.hlsl"
 #include "Light.hlsl"
 
@@ -9,6 +9,8 @@ struct BRDF {
     float3 diffuse;
     float3 specular;
     float roughness;
+    float perceptualRoughness;
+    float fresnel;
 };
 
 float OneMinusReflectivity(float metallic)
@@ -19,6 +21,7 @@ float OneMinusReflectivity(float metallic)
 
 BRDF GetBRDF (Surface surface, bool applyAlphaToDiffuse = false) {
     BRDF brdf;
+    brdf.perceptualRoughness = PerceptualSmoothnessToPerceptualRoughness(surface.smoothness);
     float oneMinusReflectivity = OneMinusReflectivity(surface.metallic);
     brdf.diffuse = surface.color * oneMinusReflectivity;
     if (applyAlphaToDiffuse)
@@ -28,7 +31,16 @@ BRDF GetBRDF (Surface surface, bool applyAlphaToDiffuse = false) {
     brdf.specular = lerp(MIN_REFLECTIVITY, surface.color, surface.metallic);
     float perceptualRoughness = PerceptualSmoothnessToPerceptualRoughness(surface.smoothness);
     brdf.roughness = PerceptualRoughnessToRoughness(perceptualRoughness);
+    brdf.fresnel = saturate(surface.smoothness + 1.0 - oneMinusReflectivity);
     return brdf;
+}
+
+float3 IndirectBRDF(Surface surface, BRDF brdf, float3 diffuse, float3 specular)
+{
+    float fresneStrength = surface.fresnelStrength * Pow4(1.0 - saturate(dot(surface.normal, surface.viewDirection)));
+    float3 reflection = specular * lerp(brdf.specular, brdf.fresnel, fresneStrength);
+    reflection /= brdf.roughness * brdf.roughness + 1.0;
+    return diffuse * brdf.diffuse + reflection;
 }
 
 float Square (float v) {
