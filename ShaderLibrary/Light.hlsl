@@ -13,6 +13,8 @@ CBUFFER_START(_CustomLight)
     int _OtherLightCount;
     float4 _OtherLightColors[MAX_OTHER_LIGHT_COUNT];
     float4 _OtherLightPositions[MAX_OTHER_LIGHT_COUNT];
+    float4 _OtherLightDirections[MAX_OTHER_LIGHT_COUNT];
+    float4 _OtherLightSpotAngles[MAX_OTHER_LIGHT_COUNT];
 CBUFFER_END
 
 struct Light {

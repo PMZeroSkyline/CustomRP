@@ -1,6 +1,6 @@
 #ifndef CUSTOM_UNLIT_PASS_INCLUDED
 #define CUSTOM_UNLIT_PASS_INCLUDED
-
+#include "UnlitInput.hlsl"
 struct Attributes {
     float3 positionOS : POSITION;
     float2 baseUV : TEXCOORD0;
@@ -11,6 +11,10 @@ struct Varyings {
 	float2 baseUV : VAR_BASE_UV;
 	UNITY_VERTEX_INPUT_INSTANCE_ID
 };
+
+TEXTURE2D(colorTex);
+SAMPLER(sampler_colorTex);
+
 
 Varyings UnlitPassVertex (Attributes input) {
 	Varyings output;
