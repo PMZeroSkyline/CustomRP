@@ -7,6 +7,9 @@ CBUFFER_START(UnityPerDraw)
     float4 unity_LODFade; // x is the fade value ranging within [0,1]. y is x quantized into 16 levels
     float4 unity_WorldTransformParams; // w is usually 1.0, or -1.0 for odd-negative scale transforms
 
+    real4 unity_LightData;
+    real4 unity_LightIndices[2];
+
     float4 unity_ProbesOcclusion;
     float4 unity_SpecCube0_HDR;
 

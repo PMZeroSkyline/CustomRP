@@ -5,7 +5,7 @@
 #include "../ShaderLibrary/Shadows.hlsl"
 #include "../ShaderLibrary/Light.hlsl"
 #include "../ShaderLibrary/BRDF.hlsl"
-#include "UnlitInput.hlsl"
+#include "LitInput.hlsl"
 struct Attributes {
     float3 positionOS : POSITION;
     float2 baseUV : TEXCOORD0;
@@ -31,12 +31,21 @@ float unity_OneOverOutputBoost;
 float unity_MaxOutputValue;
 
 float4 MetaPassFragment (Varyings input) : SV_TARGET {
-    float4 base = GetBase(input.baseUV);
+    InputConfig config = GetInputConfig(input.baseUV);
+    #if defined(_DETAIL_MAP)
+    config.detailUV = input.detailUV;
+    config.useDetail = true;
+    #endif
+    #if defined(_MASK_MAP)
+    config.useMask = true;
+    #endif
+    
+    float4 base = GetBase(config);
     Surface surface;
     ZERO_INITIALIZE(Surface, surface);
     surface.color = base.rgb;
-    surface.metallic = GetMetallic(input.baseUV);
-    surface.smoothness = GetSmoothness(input.baseUV);
+    surface.metallic = GetMetallic(config);
+    surface.smoothness = GetSmoothness(config);
     BRDF brdf = GetBRDF(surface);
     float4 meta = 0.0;
     if (unity_MetaFragmentControl.x)
@@ -46,7 +55,7 @@ float4 MetaPassFragment (Varyings input) : SV_TARGET {
         meta.rgb = min(PositivePow(meta.rgb, unity_OneOverOutputBoost), unity_MaxOutputValue);
     }
     else if (unity_MetaFragmentControl.y) {
-        meta = float4(GetEmission(input.baseUV), 1.0);
+        meta = float4(GetEmission(config), 1.0);
     }
     return meta;
 }

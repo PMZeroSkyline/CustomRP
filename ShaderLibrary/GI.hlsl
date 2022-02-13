@@ -2,6 +2,7 @@
 #define CUSTOM_GI_INCLUDED
 #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/EntityLighting.hlsl"
 #include "Common.hlsl"
+#include "Shadows.hlsl"
 struct GI
 {
     float3 diffuse;
@@ -66,7 +67,7 @@ float3 SampleLightProbe(Surface surfaceWS)
         
     }
     #endif
-}
+} 
 
 float4 SampleBakedShadows (float2 lightMapUV, Surface surfaceWS) {
     #if defined(LIGHTMAP_ON)

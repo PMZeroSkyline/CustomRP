@@ -43,9 +43,7 @@ float3 IndirectBRDF(Surface surface, BRDF brdf, float3 diffuse, float3 specular)
     return (diffuse * brdf.diffuse + reflection) * surface.occlusion;
 }
 
-float Square (float v) {
-    return v * v;
-}
+
 
 float SpecularStrength(Surface surface, BRDF brdf, Light light)
 {

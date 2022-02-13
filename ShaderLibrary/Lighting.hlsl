@@ -11,6 +11,7 @@ float3 IncomingLight (Surface surface, Light light) {
 float3 GetLighting (Surface surface, BRDF brdf, Light light) {
     return IncomingLight(surface, light) * DirectBRDF(surface, brdf, light);
 }
+
 Light GetDirectionalLight (int index, Surface surfaceWS, ShadowData shadowData)
 {
     Light light;
@@ -30,26 +31,35 @@ Light GetOtherLight (int index, Surface surfaceWS, ShadowData shadowData)
     float rangeAttenuation = Square(saturate(1.0 - Square(distanceSqr * _OtherLightPositions[index].w)));
     float4 spotAngles = _OtherLightSpotAngles[index];
     float spotAttenuation = Square(saturate(dot(_OtherLightDirections[index].xyz, light.direction) * spotAngles.x + spotAngles.y));
-    light.attenuation = spotAttenuation * rangeAttenuation / distanceSqr;
+    OtherShadowData otherShadowData = GetOtherShadowData(index);
+    light.attenuation = GetOtherShadowAttenuation(otherShadowData, shadowData, surfaceWS) * spotAttenuation * rangeAttenuation / distanceSqr;
     return light;
 }
 float3 GetLighting (Surface surfaceWS, BRDF brdf, GI gi)
 {
     ShadowData shadowData = GetShadowData(surfaceWS);
-
     shadowData.shadowMask = gi.shadowMask;
 
     float3 color = IndirectBRDF(surfaceWS, brdf, gi.diffuse, gi.specular);
     for (int i = 0; i < GetDirectionLightCont(); i++)
     {
         Light light = GetDirectionalLight(i, surfaceWS, shadowData);
-        color += GetLighting(surfaceWS, brdf, light);
+        color += GetLighting(surfaceWS, brdf, light); 
     }
-    for (int j = 0; j < GetOtherLightCount(); j++)
-    {
-        Light light = GetOtherLight(j, surfaceWS, shadowData);
-        color += GetLighting(surfaceWS, brdf, light);
-    }
+    #if defined(_LIGHTS_PER_OBJECT)
+        for (int j = 0; j < min(unity_LightData.y, 8); j++)
+        {
+            int lightIndex = unity_LightIndices[(uint)j / 4][(uint)j % 4];
+            Light light = GetOtherLight(lightIndex, surfaceWS, shadowData);
+            color += GetLighting(surfaceWS, brdf, light);
+        }
+    #else
+        for (int j = 0; j < GetOtherLightCount(); j++)
+        {
+            Light light = GetOtherLight(j, surfaceWS, shadowData);
+            color += GetLighting(surfaceWS, brdf, light);
+        }
+    #endif
     return color;
 }
 #endif

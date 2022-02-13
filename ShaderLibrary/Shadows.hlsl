@@ -15,6 +15,7 @@
 #define MAX_CASCADE_COUNT 4
 #include "Common.hlsl"
 #include "Light.hlsl"
+#include "Lighting.hlsl"
 #include "Surface.hlsl"
 
 TEXTURE2D_SHADOW(_DirectionalShadowAtlas);
@@ -43,6 +44,19 @@ struct ShadowData
     float strength;
     ShadowMask shadowMask;
 };
+struct OtherShadowData
+{
+    float strength;
+    int shadowMaskChannel;
+};
+
+OtherShadowData GetOtherShadowData (int lightInde)
+{
+    OtherShadowData data;
+    data.strength = _OtherLightShadowData[lightInde].x;
+    data.shadowMaskChannel = _OtherLightShadowData[lightInde].w;
+    return data;
+}
 
 float FadedShadowStrength(float distance, float scale, float fade)
 {
@@ -182,6 +196,22 @@ float GetDirectionalShadowAttenuation(DirectionalShadowData directional, ShadowD
         shadow = MixBakedAndRealtimeShadows(global, shadow, directional.shadowMaskChannel, directional.strength);
     }
 
+    return shadow;
+}
+float GetOtherShadowAttenuation(OtherShadowData other, ShadowData global, Surface surfaceWS)
+{
+    #if !defined(_RECEIVE_SHADOWS)
+    return 1.0;
+    #endif
+    float shadow;
+    if (other.strength > 0.0)
+    {
+        shadow = GetBakedShadow(global.shadowMask, other.shadowMaskChannel, other.strength);
+    }
+    else
+    {
+        shadow = 1.0;
+    }
     return shadow;
 }
 DirectionalShadowData GetDirectionalShadowData(int lightIndex, ShadowData shadowData)
