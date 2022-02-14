@@ -35,7 +35,7 @@ void ClipLOD(float2 positionCS, float fade)
     float dither = InterleavedGradientNoise(positionCS.xy, 0);
     clip(fade + (fade < 0.0 ? dither : -dither));
     #endif
-}
+} 
 float3 DecodeNormal(float4 sample, float scale)
 {
     #if defined(UNITY_NO_DXT5nm)
@@ -52,4 +52,6 @@ float3 NormalTangentToWorld(float3 normalTS, float3 normalWS, float4 tangentWS)
 float Square (float v) {
     return v * v;
 }
+
+
 #endif

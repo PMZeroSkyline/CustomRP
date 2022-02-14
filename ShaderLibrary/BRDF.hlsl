@@ -1,8 +1,7 @@
 #ifndef CUSTOM_BRDF_INCLUDED
 #define CUSTOM_BRDF_INCLUDED
 #define MIN_REFLECTIVITY 0.04
-#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/ImagebasedLighting.hlsl"
-#include "Surface.hlsl"
+#include "Common.hlsl"
 #include "Light.hlsl"
 
 struct BRDF {

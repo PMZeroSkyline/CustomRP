@@ -3,6 +3,7 @@
 #define MAX_DIRECTIONAL_LIGHT_COUNT 4
 #define MAX_OTHER_LIGHT_COUNT 64
 #include "Common.hlsl"
+
 CBUFFER_START(_CustomLight)
     int _DirectionalLightCount;
     float4 _DirectionalLightColors[MAX_DIRECTIONAL_LIGHT_COUNT];
@@ -16,7 +17,6 @@ CBUFFER_START(_CustomLight)
     float4 _OtherLightSpotAngles[MAX_OTHER_LIGHT_COUNT];
     float4 _OtherLightShadowData[MAX_OTHER_LIGHT_COUNT];
 CBUFFER_END
-
 struct Light {
     float3 color;
     float3 direction;

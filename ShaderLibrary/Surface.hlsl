@@ -1,5 +1,6 @@
 #ifndef CUSTOM_SURFACE_INCLUDED
 #define CUSTOM_SURFACE_INCLUDED
+#include "Common.hlsl"
 
 struct Surface {
     float3 position;

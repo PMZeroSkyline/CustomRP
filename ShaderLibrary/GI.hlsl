@@ -1,6 +1,7 @@
 ﻿#ifndef CUSTOM_GI_INCLUDED
 #define CUSTOM_GI_INCLUDED
 #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/EntityLighting.hlsl"
+#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/ImageBasedLighting.hlsl"
 #include "Common.hlsl"
 #include "Shadows.hlsl"
 struct GI
@@ -9,13 +10,6 @@ struct GI
     float3 specular;
     ShadowMask shadowMask;
 };
-
-TEXTURE2D(unity_Lightmap);
-SAMPLER(samplerunity_Lightmap);
-TEXTURE2D(unity_ShadowMask);
-SAMPLER(samplerunity_ShadowMask);
-TEXTURECUBE(unity_SpecCube0);
-SAMPLER(samplerunity_SpecCube0);
 
 float3 SampleLightMap(float2 lightMapUV)
 {
