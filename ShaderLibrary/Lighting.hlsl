@@ -1,11 +1,11 @@
 #ifndef CUSTOM_LIGHTING_INCLUDED
 #define CUSTOM_LIGHTING_INCLUDED
-
 #include "Common.hlsl"
 #include "Light.hlsl"
-#include "Shadows.hlsl"
 #include "BRDF.hlsl"
 #include "GI.hlsl"
+#include "Shadows.hlsl"
+
 
 float3 IncomingLight (Surface surface, Light light) {
 	return saturate(dot(surface.normal, light.direction) * light.attenuation) * light.color;
@@ -39,6 +39,7 @@ Light GetOtherLight (int index, Surface surfaceWS, ShadowData shadowData)
     float spotAttenuation = Square(saturate(dot(spotDirection, light.direction) * spotAngles.x + spotAngles.y));
     OtherShadowData otherShadowData = GetOtherShadowData(index);
     otherShadowData.lightPositionWS = position;
+    otherShadowData.lightDirectionWS = light.direction;
     otherShadowData.spotDirectionWS = spotDirection;
     light.attenuation = GetOtherShadowAttenuation(otherShadowData, shadowData, surfaceWS) * spotAttenuation * rangeAttenuation / distanceSqr;
     return light;

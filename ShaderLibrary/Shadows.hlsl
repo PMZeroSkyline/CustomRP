@@ -27,7 +27,6 @@
 #define MAX_CASCADE_COUNT 4
 #include "Common.hlsl"
 #include "Light.hlsl"
-#include "Lighting.hlsl"
 #include "Surface.hlsl"
 
 TEXTURE2D_SHADOW(_DirectionalShadowAtlas);
@@ -58,21 +57,32 @@ struct ShadowData
     float strength;
     ShadowMask shadowMask;
 };
+struct DirectionalShadowData
+{
+    float strength;
+    int tileIndex;
+    float normalBias;
+    int shadowMaskChannel;
+};
 struct OtherShadowData
 {
     float strength;
     int tileIndex;
+    bool isPoint;
     int shadowMaskChannel;
     float3 lightPositionWS;
+    float3 lightDirectionWS;
     float3 spotDirectionWS;
 };
-OtherShadowData GetOtherShadowData (int lightInde)
+OtherShadowData GetOtherShadowData (int lightIndex)
 {
     OtherShadowData data;
-    data.strength = _OtherLightShadowData[lightInde].x;
-    data.tileIndex = _OtherLightShadowData[lightInde].y;
-    data.shadowMaskChannel = _OtherLightShadowData[lightInde].w;
+    data.strength = _OtherLightShadowData[lightIndex].x;
+    data.tileIndex = _OtherLightShadowData[lightIndex].y;
+    data.shadowMaskChannel = _OtherLightShadowData[lightIndex].w;
+    data.isPoint = _OtherLightShadowData[lightIndex].z == 1.0;
     data.lightPositionWS = 0.0;
+    data.lightDirectionWS = 0.0;
     data.spotDirectionWS = 0.0;
     return data;
 }
@@ -125,13 +135,7 @@ ShadowData GetShadowData(Surface surfaceWS)
     data.cascadeIndex = i;
     return data;
 }
-struct DirectionalShadowData
-{
-    float strength;
-    int tileIndex;
-    float normalBias;
-    int shadowMaskChannel;
-};
+
 float SampleDirectionalShadowAtlas(float3 positionSTS)
 {
     return SAMPLE_TEXTURE2D_SHADOW(_DirectionalShadowAtlas, SHADOW_SAMPLER, positionSTS);
@@ -154,11 +158,12 @@ float FilterDirectionalShadow(float3 positionSTS)
         return SampleDirectionalShadowAtlas(positionSTS); 
     #endif
 }
-float SampleOtherShadowAtlas(float3 positionSTS)
+float SampleOtherShadowAtlas(float3 positionSTS, float3 bounds)
 {
+    positionSTS.xy = clamp(positionSTS.xy, bounds.xy, bounds.xy + bounds.z);
     return SAMPLE_TEXTURE2D_SHADOW(_OtherShadowAtlas, SHADOW_SAMPLER, positionSTS);
 }
-float FilterOtherShadow(float3 positionSTS)
+float FilterOtherShadow(float3 positionSTS, float3 bounds)
 {
     #if defined(OTHER_FILTER_SETUP)
     float weights[DIRECTIONAL_FILTER_SAMPLES];
@@ -168,11 +173,11 @@ float FilterOtherShadow(float3 positionSTS)
     float shadow = 0;
     for (int i = 0; i < OTHER_FILTER_SAMPLES; i++) 
     {
-        shadow += weights[i] * SampleOtherShadowAtlas(float3(positions[i].xy, positionSTS.z));
+        shadow += weights[i] * SampleOtherShadowAtlas(float3(positions[i].xy, positionSTS.z), bounds);
     }
     return shadow;
     #else
-    return SampleOtherShadowAtlas(positionSTS); 
+    return SampleOtherShadowAtlas(positionSTS, bounds); 
     #endif
 }
 float GetCascadedShadow (DirectionalShadowData directional, ShadowData global, Surface surfaceWS)
@@ -240,12 +245,14 @@ float GetDirectionalShadowAttenuation(DirectionalShadowData directional, ShadowD
 }
 float GetOtherShadow(OtherShadowData other, ShadowData global, Surface surfaceWS)
 {
-    float4 tileData = _OtherShadowTiles[other.tileIndex];
+    float tileIndex = other.tileIndex;
+    float3 lightPlane = other.spotDirectionWS;
+    float4 tileData = _OtherShadowTiles[tileIndex];
     float3 surfaceToLight = other.lightPositionWS - surfaceWS.position;
-    float3 distanceToLightPlane = dot(surfaceToLight, other.spotDirectionWS);
+    float3 distanceToLightPlane = dot(surfaceToLight, lightPlane);
     float3 normalBias = surfaceWS.interpolatedNormal * (distanceToLightPlane * tileData.w);
-    float4 positionSTS = mul(_OtherShadowMatrices[other.tileIndex], float4(surfaceWS.position + normalBias, 1.0));
-    return FilterOtherShadow(positionSTS.xyz / positionSTS.w);
+    float4 positionSTS = mul(_OtherShadowMatrices[tileIndex], float4(surfaceWS.position + normalBias, 1.0));
+    return FilterOtherShadow(positionSTS.xyz / positionSTS.w, tileData.xyz);
 }
 float GetOtherShadowAttenuation(OtherShadowData other, ShadowData global, Surface surfaceWS)
 {
