@@ -2,7 +2,6 @@
 #define CUSTOM_LIT_INPUT_INCLUDED
 
 #include "../ShaderLibrary/Common.hlsl"
-
 #define INPUT_PROP(name) UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, name)
 
 TEXTURE2D(_BaseMap);

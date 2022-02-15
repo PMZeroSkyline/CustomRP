@@ -5,10 +5,11 @@ using UnityEngine.Rendering;
 public class CustomRenderPipelineAsset : RenderPipelineAsset
 {
     [SerializeField] private bool useDynamicBatching = true, useGPUInstancing = true, userSRPBatcher = true, useLightsPerObject = true;
-    [SerializeField] ShadowSettings shadows = default;
-    
+    [SerializeField] private ShadowSettings shadows = default;
+    [SerializeField] private PostFXSettings postFXSettings = default;
+
     protected override RenderPipeline CreatePipeline()
     {
-        return new CustomRenderPipeline(useDynamicBatching, useGPUInstancing, userSRPBatcher, useLightsPerObject, shadows);
+        return new CustomRenderPipeline(useDynamicBatching, useGPUInstancing, userSRPBatcher, useLightsPerObject, shadows, postFXSettings);
     }
 }

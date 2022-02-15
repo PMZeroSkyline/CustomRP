@@ -1,6 +1,6 @@
 #ifndef CUSTOM_SHADOW_CASTER_PASS_INCLUDED
 #define CUSTOM_SHADOW_CASTER_PASS_INCLUDED
-#include "UnlitInput.hlsl"
+#include "LitInput.hlsl"
 struct Attributes {
     float3 positionOS : POSITION;
     float2 baseUV : TEXCOORD0;
@@ -31,10 +31,11 @@ Varyings ShadowCasterPassVertex (Attributes input) {
 }
  
 float4 ShadowCasterPassFragment (Varyings input) : SV_TARGET {
-	UNITY_SETUP_INSTANCE_ID(input) 
-	float4 base = GetBase(input.baseUV);
+	UNITY_SETUP_INSTANCE_ID(input)
+	InputConfig config = GetInputConfig(input.baseUV);
+	float4 base = GetBase(config);
 	#if defined(_SHADOWS_CLIP)
-		clip(base.a - GetCutoff(input.baseUV));
+		clip(base.a - GetCutoff(config));
 	#elif defined(_SHADOWS_DITHER)
 		float dither = InterleavedGradientNoise(input.positionCS.xy, 0);
 		clip(base.a - dither);

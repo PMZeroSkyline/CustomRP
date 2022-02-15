@@ -243,10 +243,24 @@ float GetDirectionalShadowAttenuation(DirectionalShadowData directional, ShadowD
 
     return shadow;
 }
+static const float3 pointShadowPlanes[6] = {
+    float3(-1.0, 0.0, 0.0),
+    float3(1.0, 0.0, 0.0),
+    float3(0.0, -1.0, 0.0),
+    float3(0.0, 1.0, 0.0),
+    float3(0.0, 0.0, -1.0),
+    float3(0.0, 0.0, 1.0)
+};
 float GetOtherShadow(OtherShadowData other, ShadowData global, Surface surfaceWS)
 {
     float tileIndex = other.tileIndex;
     float3 lightPlane = other.spotDirectionWS;
+    if (other.isPoint)
+    {
+        float faceOffset = CubeMapFaceID(-other.lightDirectionWS);
+        tileIndex += faceOffset;
+        lightPlane = pointShadowPlanes[faceOffset];
+    }
     float4 tileData = _OtherShadowTiles[tileIndex];
     float3 surfaceToLight = other.lightPositionWS - surfaceWS.position;
     float3 distanceToLightPlane = dot(surfaceToLight, lightPlane);
