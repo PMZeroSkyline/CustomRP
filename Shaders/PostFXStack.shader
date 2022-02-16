@@ -85,7 +85,7 @@
             HLSLPROGRAM
                 #pragma target 3.5
                 #pragma vertex DefaultPassVertex
-                #pragma fragment ToneMappingNonePassFragment
+                #pragma fragment ColorGradingNonePassFragment
             ENDHLSL
         }
         Pass
@@ -94,7 +94,7 @@
             HLSLPROGRAM
                 #pragma target 3.5
                 #pragma vertex DefaultPassVertex
-                #pragma fragment ToneMappingACESPassFragment
+                #pragma fragment ColorGradingACESPassFragment
             ENDHLSL
         }
         Pass
@@ -103,7 +103,7 @@
             HLSLPROGRAM
                 #pragma target 3.5
                 #pragma vertex DefaultPassVertex
-                #pragma fragment ToneMappingNeutralPassFragment
+                #pragma fragment ColorGradingNeutralPassFragment
             ENDHLSL
         }
         Pass
@@ -112,7 +112,7 @@
             HLSLPROGRAM
                 #pragma target 3.5
                 #pragma vertex DefaultPassVertex
-                #pragma fragment ToneMappingReinhardPassFragment
+                #pragma fragment ColorGradingReinhardPassFragment
             ENDHLSL
         }
         
@@ -128,6 +128,18 @@
             
             ENDHLSL
         }
+        
+        Pass
+        {
+            Name "Final"
+            
+            HLSLPROGRAM
 
+                #pragma target 3.5
+                #pragma vertex DefaultPassVertex
+                #pragma fragment FinalPassFragment
+            
+            ENDHLSL
+        }
     }
 }
