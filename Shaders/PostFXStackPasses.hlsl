@@ -19,6 +19,8 @@ float _BloomIntensity;
 float4 _ColorAdjustments;
 float4 _ColorFilter;
 
+float4 _WhiteBalance;
+
 float4 GetSource(float2 screenUV)
 {
     return SAMPLE_TEXTURE2D_LOD(_PostFXSource, sampler_linear_clamp, screenUV, 0);
@@ -214,10 +216,17 @@ float3 ColorGradingSaturation(float3 color)
     float luminance = Luminance(color);
     return (color - luminance) * _ColorAdjustments.w + luminance;
 }
+float3 ColorGradeWhiteBalance(float3 color)
+{
+    color = LinearToLMS(color);
+    color *= _WhiteBalance.rgb;
+    return LMSToLinear(color);
+}
 float3 ColorGrade(float3 color)
 {
     color = min(color, 60.0);
     color = ColorGradePostExposure(color);
+    color = ColorGradeWhiteBalance(color);
     color = ColorGradingContrast(color);
     color = ColorGradeColorFilter(color);
     color = max(color, 0);

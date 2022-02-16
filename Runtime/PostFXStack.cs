@@ -195,10 +195,11 @@ public partial class PostFXStack
             ));
         buffer.SetGlobalColor(colorFilterId, colorAdjustments.colorFilter.linear);
     }
-    void ConfigureWhiteBalance()
-    {
-        WhiteBalanceSettings whiteBalance = settings.WhiteBlance;
-        buffer.SetGlobalVector(whiteBalanceId, ColorUtils.ColorBalanceToLMSCoeffs(whiteBalance.temperature, whiteBalance.tint));
+    void ConfigureWhiteBalance () {
+        WhiteBalanceSettings whiteBalance = settings.WhiteBalance;
+        buffer.SetGlobalVector(whiteBalanceId, ColorUtils.ColorBalanceToLMSCoeffs(
+            whiteBalance.temperature, whiteBalance.tint
+        ));
     }
 
     void DoColorGradingAndToneMapping(int sourceId)

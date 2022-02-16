@@ -70,8 +70,7 @@ public class PostFXSettings : ScriptableObject
     }
 
     [SerializeField] private WhiteBalanceSettings whiteBalance = default;
-    public WhiteBalanceSettings WhiteBlance => WhiteBlance;
-    
+    public WhiteBalanceSettings WhiteBalance => whiteBalance;    
     
     [System.Serializable]
     public struct ToneMappingSettings
