@@ -135,7 +135,7 @@ float4 BloomVerticalPassFragment(Varyings input) : SV_TARGET
     }
     return float4(color, 1.0);
 }
-float4 BloomCombinePassFragment (Varyings input) : SV_Target
+float4 BloomAddPassFragment (Varyings input) : SV_Target
 {
     float3 lowRes;
     if (_BloomBicubicUpsampling)
@@ -146,8 +146,8 @@ float4 BloomCombinePassFragment (Varyings input) : SV_Target
     {
         lowRes = GetSource(input.screenUV).rgb;
     }
-    float3 highRes = GetSource2(input.screenUV).rgb;
-    return float4(lowRes * _BloomIntensity + highRes, 1.0);
+    float4 highRes = GetSource2(input.screenUV);
+    return float4(lowRes * _BloomIntensity + highRes.rgb, highRes.a);
 }
 float4 BloomScatterPassFragment (Varyings input) : SV_TARGET
 {
@@ -160,8 +160,8 @@ float4 BloomScatterPassFragment (Varyings input) : SV_TARGET
     {
         lowRes = GetSource(input.screenUV).rgb;
     }
-    float3 highRes = GetSource2(input.screenUV).rgb;
-    return float4(lerp(highRes, lowRes, _BloomIntensity), 1.0);
+    float4 highRes = GetSource2(input.screenUV);
+    return float4(lerp(highRes.rgb, lowRes, _BloomIntensity), highRes.a);
 }
 float4 BloomScatterFinalPassFragment (Varyings input) : SV_TARGET
 {
@@ -174,9 +174,9 @@ float4 BloomScatterFinalPassFragment (Varyings input) : SV_TARGET
     {
         lowRes = GetSource(input.screenUV).rgb;
     }
-    float3 highRes = GetSource2(input.screenUV).rgb;
+    float4 highRes = GetSource2(input.screenUV);
     lowRes += highRes - ApplyBloomThreshold(highRes);
-    return float4(lerp(highRes, lowRes, _BloomIntensity), 1.0);
+    return float4(lerp(highRes.rgb, lowRes, _BloomIntensity), highRes.a);
 }
 float4 BloomPrefilterPassFragment(Varyings input) : SV_Target
 {

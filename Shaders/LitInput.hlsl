@@ -27,6 +27,7 @@ UNITY_INSTANCING_BUFFER_START(UnityPerMaterial)
     UNITY_DEFINE_INSTANCED_PROP(float, _Occlusion)
     UNITY_DEFINE_INSTANCED_PROP(float, _Smoothness)
     UNITY_DEFINE_INSTANCED_PROP(float, _Cutoff)
+    UNITY_DEFINE_INSTANCED_PROP(float, _ZWrite)
     UNITY_DEFINE_INSTANCED_PROP(float, _Fresnel)
     UNITY_DEFINE_INSTANCED_PROP(float, _DetailAlbedo)
     UNITY_DEFINE_INSTANCED_PROP(float, _DetailSmoothness)
@@ -148,5 +149,9 @@ float3 GetNormalTS (InputConfig c)
     }
     
     return normal;
+}
+float GetFinalAlpha(float alpha)
+{
+    return INPUT_PROP(_ZWrite) ? 1.0 : alpha;
 }
 #endif
