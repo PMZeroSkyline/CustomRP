@@ -44,8 +44,8 @@ Varyings LitPassVertex (Attributes input) {
 }
 float4 LitPassFragment (Varyings input) : SV_TARGET {
 	UNITY_SETUP_INSTANCE_ID(input);
-	ClipLOD(input.positionCS.xy, unity_LODFade.x);
-	InputConfig config = GetInputConfig(input.baseUV);
+	InputConfig config = GetInputConfig(input.positionCS, input.baseUV);
+	ClipLOD(config.fragment, unity_LODFade.x);
 	#if defined(_DETAIL_MAP)
 	config.detailUV = input.detailUV;
 	config.useDetail = true;
@@ -72,7 +72,7 @@ float4 LitPassFragment (Varyings input) : SV_TARGET {
 	surface.occlusion = GetOcclusion(config);
 	surface.smoothness = GetSmoothness(config);
 	surface.fresnelStrength = GetFresnel(config);
-	surface.dither = InterleavedGradientNoise(input.positionCS.xy, 0);
+	surface.dither = InterleavedGradientNoise(config.fragment.positionSS, 0);
 	surface.renderingLayerMask = asuint(unity_RenderingLayer.x);
 	surface.viewDirection = normalize(_WorldSpaceCameraPos - input.positionWS);
 	surface.depth = -TransformWorldToView(input.positionWS).z;

@@ -4,6 +4,8 @@ using UnityEngine.Rendering;
 [Serializable]
 public class CameraSettings
 {
+    public bool copyColor = true, copyDepth = true;
+    
     [RenderingLayerMaskField]
     public int renderingLayerMask = -1;
 
@@ -25,4 +27,5 @@ public class CameraSettings
         destination = BlendMode.Zero
     };
     
+
 }

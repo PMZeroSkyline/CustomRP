@@ -24,6 +24,12 @@ CBUFFER_START(UnityPerDraw)
     float4 unity_LightmapST;
     float4 unity_DynamicLightmapST;
 
+    float4 unity_OrthoParams;
+    float4 _ProjectionParams;
+    float4 _ScreenParams;
+    float4 _ZBufferParams;
+
+
 
     float4 unity_SHAr;
     float4 unity_SHAg;

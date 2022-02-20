@@ -30,7 +30,7 @@ float unity_OneOverOutputBoost;
 float unity_MaxOutputValue;
 
 float4 MetaPassFragment (Varyings input) : SV_TARGET {
-    InputConfig config = GetInputConfig(input.baseUV);
+    InputConfig config = GetInputConfig(input.positionCS, input.baseUV);
     #if defined(_DETAIL_MAP)
     config.detailUV = input.detailUV;
     config.useDetail = true;
