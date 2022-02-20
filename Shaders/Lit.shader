@@ -62,7 +62,6 @@
 			#pragma multi_compile_instancing
             #pragma vertex LitPassVertex
             #pragma fragment LitPassFragment
-            #include "LitInput.hlsl"
             #include "LitPass.hlsl"
 
             ENDHLSL

@@ -33,8 +33,7 @@
 
             ENDHLSL
         }
-		Pass 
-    	{
+		Pass {
 			Tags {
 				"LightMode" = "Meta"
 			}
