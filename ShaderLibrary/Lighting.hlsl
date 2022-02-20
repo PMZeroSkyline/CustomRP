@@ -6,7 +6,10 @@
 #include "GI.hlsl"
 #include "Shadows.hlsl"
 
-
+bool RenderingLayersOverlap (Surface surface, Light light)
+{
+    return (surface.renderingLayerMask & light.renderingLayerMask) != 0;
+}
 float3 IncomingLight (Surface surface, Light light) {
 	return saturate(dot(surface.normal, light.direction) * light.attenuation) * light.color;
 }
@@ -18,7 +21,8 @@ Light GetDirectionalLight (int index, Surface surfaceWS, ShadowData shadowData)
 {
     Light light;
     light.color = _DirectionalLightColors[index].rgb;
-    light.direction = _DirectionalLightDirections[index].xyz;
+    light.direction = _DirectionalLightDirectionsAndMasks[index].xyz;
+    light.renderingLayerMask = asuint(_DirectionalLightDirectionsAndMasks[index].w);
     DirectionalShadowData dirShadowData = GetDirectionalShadowData(index, shadowData);
     light.attenuation = GetDirectionalShadowAttenuation(dirShadowData, shadowData, surfaceWS);
     return light;
@@ -30,8 +34,8 @@ Light GetOtherLight (int index, Surface surfaceWS, ShadowData shadowData)
     float3 position = _OtherLightPositions[index].xyz;
     float3 ray = position - surfaceWS.position;
 
-    float3 spotDirection = _OtherLightDirections[index].xyz;
-    
+    float3 spotDirection = _OtherLightDirectionsAndMasks[index].xyz;
+    light.renderingLayerMask = asuint(_OtherLightDirectionsAndMasks[index].w);
     light.direction = normalize(ray);
     float distanceSqr = max(dot(ray, ray), 0.00001);
     float rangeAttenuation = Square(saturate(1.0 - Square(distanceSqr * _OtherLightPositions[index].w)));
@@ -53,22 +57,32 @@ float3 GetLighting (Surface surfaceWS, BRDF brdf, GI gi)
     for (int i = 0; i < GetDirectionLightCont(); i++)
     {
         Light light = GetDirectionalLight(i, surfaceWS, shadowData);
-        color += GetLighting(surfaceWS, brdf, light); 
+        if (RenderingLayersOverlap(surfaceWS, light))
+        {
+            color += GetLighting(surfaceWS, brdf, light); 
+        }
     }
     #if defined(_LIGHTS_PER_OBJECT)
         for (int j = 0; j < min(unity_LightData.y, 8); j++)
         {
             int lightIndex = unity_LightIndices[(uint)j / 4][(uint)j % 4];
             Light light = GetOtherLight(lightIndex, surfaceWS, shadowData);
-            color += GetLighting(surfaceWS, brdf, light);
+            if (RenderingLayersOverlap(surfaceWS, light))
+            {
+                color += GetLighting(surfaceWS, brdf, light);
+            }
         }
     #else
         for (int j = 0; j < GetOtherLightCount(); j++)
         {
             Light light = GetOtherLight(j, surfaceWS, shadowData);
-            color += GetLighting(surfaceWS, brdf, light);
+            if (RenderingLayersOverlap(surfaceWS, light))
+            {
+                color += GetLighting(surfaceWS, brdf, light);
+            }
         }
     #endif
     return color;
 }
+
 #endif
