@@ -8,7 +8,8 @@ public partial class CustomRenderPipelineAsset : RenderPipelineAsset
     [SerializeField] private ShadowSettings shadows = default;
     [SerializeField] private CameraBufferSettings cameraBuffer = new CameraBufferSettings
     {
-        allowHDR = true
+        allowHDR = true,
+        renderScale = 1f
     };
     [SerializeField] private PostFXSettings postFXSettings = default;
     public enum ColorLUTResolution

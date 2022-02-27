@@ -28,6 +28,8 @@ float4 _ColorGradingLUTParameters;
 bool _ColorGradingLUTInLogC;
 TEXTURE2D(_ColorGradingLUT);
 
+bool _CopyBicubic;
+
 float4 GetSource(float2 screenUV)
 {
     return SAMPLE_TEXTURE2D_LOD(_PostFXSource, sampler_linear_clamp, screenUV, 0);
@@ -308,5 +310,12 @@ float4 FinalPassFragment(Varyings input) : SV_TARGET
     color.rgb = ApplyColorGradingLUT(color.rgb);
     return color;
 }
-
+float4 FinalPassFragmentRescale (Varyings input) : SV_TARGET {
+    if (_CopyBicubic) {
+        return GetSourceBicubic(input.screenUV);
+    }
+    else {
+        return GetSource(input.screenUV);
+    }
+}
 #endif

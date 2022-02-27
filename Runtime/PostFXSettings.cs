@@ -38,6 +38,7 @@ public class PostFXSettings : ScriptableObject
         }
         public Mode mode;
         [Range(0.05f, 0.95f)] public float scatter;
+        public bool ingnoreRenderScale;
     }
 
     [SerializeField] private BloomSettings bloom = new BloomSettings
